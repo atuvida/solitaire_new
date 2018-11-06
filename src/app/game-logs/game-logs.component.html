@@ -1,0 +1,11 @@
+<div #logsBox [class.logs]="activeLogs || activeHints" [scrollTop]="scrolltop">
+    <div [class.active]="activeLogs" [class.inactive]="!activeLogs" *ngFor="let log of gameLogs">
+      <span [style.color]="(log.Card == undefined) ? 'rgb(219, 76, 76)' : ((log.Card.color == color.Red) ? 'rgb(219, 76, 76)' : 'white')" 
+      class="logDetail1">{{log.Detail1}}</span>
+      <span class="logDetail2">{{log.toString()}}</span>
+    </div>
+    <div [class.active]="activeHints" [class.inactive]="!activeHints" *ngFor="let hint of gameHints">
+      <span [style.color]="(hint.Card == undefined) ? 'rgb(219, 76, 76)' : ((hint.Card.color == color.Red) ? 'rgb(219, 76, 76)' : 'white')" class="logDetail1">{{hint.Detail1}}</span>
+      <span class="logDetail2">{{hint.toString()}}</span>
+    </div>
+</div>

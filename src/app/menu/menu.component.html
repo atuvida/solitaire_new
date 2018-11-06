@@ -1,0 +1,10 @@
+<div id="menuHead" (click)="toggleMenu($event)">
+    <div class="menuLines"></div>
+    <div class="menuLines"></div>
+    <div class="menuLines"></div>
+</div>
+<div id="{{'menu'+i}}" *ngFor="let item of menu; let i = index; let even = even; let odd = odd" [@menuSlide]="menu.length"
+class="menuBtn" (click)="selected($event,item)" [class.active]="((item == 'Hints') && (hintsActive))||((item == 'Logs') && (logActive))" 
+[style.transform]="onMobileWindow ? 'translate('+i*175+'%,5%)' : 'translate(-120%,'+(i-1)*120+'%)'" >
+<div>{{item}}</div>
+</div>

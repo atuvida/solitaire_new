@@ -1,0 +1,8 @@
+<div id="overlayText">
+  <div *ngFor="let text of textDisplay">
+    {{text}}
+  </div>
+  <div *ngFor="let option of options" class="options" (click)="selectionMade(option)">
+    {{option}}
+  </div>
+</div>

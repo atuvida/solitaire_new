@@ -1,0 +1,2 @@
+<div id="undo" [class.inactive]="gameLogs.length == 1" [class.active]="gameLogs.length > 1"
+  (click)="undoLastMove()" ></div>
