@@ -1,4 +1,4 @@
-import { DeckTypes, RANK, SUIT } from './enums/enums';
+import { DeckTypes, RANK, SUIT, FLIPS } from './enums/enums';
 import { UtilityService } from './utility.service';
 import { Deck } from './deck';
 import { Card } from './card';
@@ -19,6 +19,8 @@ export class DeckService {
   hintsCheck: boolean = false;
   zIndex: number = 100;
   playableDecks: Deck[][] = [this.maneuvers, this.foundations, [this.waste], [this.talon]];
+  flipCount: number = FLIPS.HARDMODE;
+  gameWon: boolean = false;
 
   generateMainDeck(): void {
 
@@ -86,11 +88,14 @@ export class DeckService {
             return;
           }
 
-          this.transferCard(card, sourceDeck, deck);
+          this.transferCard(card, sourceDeck, deck, true);
 
           if (this.allCardsFlipped()) {
-            this.clearManeuvers();
-            this.utilityService.gameWon();
+            if(!this.gameWon){
+              this.gameWon = true;
+              this.clearManeuvers();
+              this.utilityService.gameWon();
+            }
             return;
           }
           this.suggestNextMove();
@@ -121,7 +126,7 @@ export class DeckService {
           this.clearManeuvers();
         }, 300);
       } else {
-        this.clearManeuvers();
+          this.clearManeuvers();
       }
     }
   }
@@ -213,7 +218,7 @@ export class DeckService {
     }
   }
 
-  getDeckInstance(DeckId: String): Deck {
+  getDeck(DeckId: String): Deck {
     let decks = this.playableDecks;
     let deck: Deck;
     for (let i = 0; i < decks.length; i++) {
@@ -233,41 +238,65 @@ export class DeckService {
     card.flip();
     return card;
   }
-  sourceDeck(card: Card): Deck {
 
-    return;
-  }
+  transferCard(card: Card, sourceDeck: Deck, destDeck: Deck, toLog: boolean, CardSet?: Card[]) {
 
-  transferCard(card: Card, sourceDeck: Deck, destDeck: Deck, toLog?: boolean) {
-    if (toLog !== undefined) {
-      if (!destDeck.isEmpty() && destDeck.type == DeckTypes.Maneuver) {
-        if (destDeck.size == 1 && destDeck.topCard.rank !== RANK.K) {
-          if (destDeck.topCard.flipped) {
-            destDeck.flipTop();
+    let cardset: Card[] = [];
+
+    if (!toLog) {
+      if (destDeck.type == DeckTypes.Maneuver) {
+        if (!destDeck.isEmpty()) {
+          if (destDeck.size == 1) {
+            if (destDeck.topCard.flipped) {
+              destDeck.flipTop();
+            }
+          }
+          if (destDeck.size > 1) {
+            if (destDeck.topCard.flipped && !destDeck.nextTop.flipped) {
+              destDeck.flipTop();
+            }
           }
         }
-        if(destDeck.size > 1){
-          if (destDeck.topCard.flipped && !destDeck.nextTop.flipped) {
-            destDeck.flipTop();
-          }
+        cardset = sourceDeck.createSetFrom(card);
+      }
+
+      if (sourceDeck.type == DeckTypes.Waste && destDeck.type == DeckTypes.Talon) {
+        cardset = sourceDeck.createSetFrom(sourceDeck.cards[sourceDeck.size - CardSet.length]).reverse();
+        sourceDeck.flipFromFirstDownCards(cardset.length);
+      }
+      if (sourceDeck.type == DeckTypes.Talon) {
+        cardset = sourceDeck.cards.reverse();
+      }
+      if (destDeck.type == DeckTypes.Waste && sourceDeck.type !== DeckTypes.Talon
+        || destDeck.type == DeckTypes.Foundation) {
+        cardset = sourceDeck.createSetFrom(card)
+      }
+      if (sourceDeck.type == DeckTypes.Maneuver && !sourceDeck.isEmpty()) {
+        if (!sourceDeck.topCard.flipped) {
+          sourceDeck.topCard.flip();
         }
       }
-      let cardSet: Card[] = sourceDeck.createSetFrom(card);
-      if(sourceDeck.type == DeckTypes.Talon || sourceDeck.type == DeckTypes.Waste){
-        cardSet.reverse();
+      if (destDeck.type == DeckTypes.Waste && (sourceDeck.type == DeckTypes.Maneuver || sourceDeck.type == DeckTypes.Foundation)) {
+        destDeck.flipFromFirstUpCards(1);
       }
-      destDeck.addSet(cardSet);
+      destDeck.addSet(cardset);
       return;
     }
-    this.utilityService.createLog(sourceDeck, destDeck, card);
-    let cardSet = sourceDeck.createSetFrom(card);
-    if(sourceDeck.type == DeckTypes.Talon || sourceDeck.type == DeckTypes.Waste){
-      cardSet.reverse();
-    }
-    destDeck.addSet(cardSet);
+    cardset = sourceDeck.createSetFrom(card);
+    this.utilityService.createLog(sourceDeck, destDeck, card, cardset);
+
+
     if (sourceDeck.type == DeckTypes.Talon || sourceDeck.type == DeckTypes.Waste) {
+      cardset.reverse();
+      if (sourceDeck.type == DeckTypes.Waste) {
+        sourceDeck.flipFromFirstDownCards(cardset.length);
+      }
+      destDeck.addSet(cardset);
       return;
     }
+
+    destDeck.addSet(cardset);
+
     if (!sourceDeck.isEmpty()) {
       if (!sourceDeck.topCard.flipped
         && (sourceDeck.type !== DeckTypes.Talon && sourceDeck.type !== DeckTypes.Waste)) {

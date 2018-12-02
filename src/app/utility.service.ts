@@ -33,20 +33,19 @@ export class UtilityService {
   private logStatus = new Subject<boolean>();
   private hintStatus = new Subject<boolean>();
 
-  createLog(source: Deck, target: Deck, card?: Card) {
+  createLog(source: Deck, target: Deck, card: Card, cardset: Card[]) {
+    let cardSetCopy: Card[] = cardset.slice();
 
     let log: GameLog = {
       SourceDeck: source, DestDeck: target,
-      Card: card, Detail1: ""
+      Card: card, Detail1: "", CardSet: cardSetCopy
     };
 
     let cardsToStrings = "";
-    if (log.Card !== undefined) {
-      for(let i=source.cardIndex(card); i<source.size; i++){
-        cardsToStrings += source.cards[i].toString()+" ";
-      }
+
+    for(let i: number = 0; i < log.CardSet.length; i++){
+      cardsToStrings += log.CardSet[i].toString()+" ";
     }
-    
     log.Detail1 = cardsToStrings;
     log.toString = () => {
       return log.SourceDeck.id + " to " + log.DestDeck.id;

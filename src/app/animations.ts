@@ -3,13 +3,22 @@ import { trigger, style, transition, animate, keyframes, query, stagger, state }
 export let wasteAnimation = 
 trigger('wasteFlip',[
   transition('*=>*', [
-    query(':enter', style({opacity: 0}), {optional: true}),
     query(':enter', stagger('50ms', [
-      animate('.4s ease-in', keyframes([
-        style({opacity: 0.4, transform: 'translateX(150%)', offset: 0.20}),
-        style({opacity: 1, transform: 'translateY(-50%)', offset: 0.30}),
-        style({opacity: 1, transform: 'rotateY(180deg)', offset: 0.40}),
+      animate('0.9s ease-in', keyframes([
+        style({opacity: 0, zIndex: 2000, offset: 0.0}),
+        style({opacity: 0, transform: 'translateX(80%)', offset: 0.20}),
+        style({opacity: 0, transform: 'translateY(-50%)', offset: 0.30}),
+        style({opacity: 1, transform: 'rotateY(180deg)', offset: 0.35}),
+        style({opacity: 1, transform: 'rotateZ(-2deg)', offset: 0.70}),
+        style({opacity: 1, transform: 'rotateZ(1deg)', offset: 0.95}),
         style({opacity: 1, transform: 'translateX(0)', offset: 1 })
+      ]))
+    ]), {optional: true}),
+    query(':leave', stagger('30ms', [
+      animate('.3s ease-in', keyframes([
+        style({opacity: 1, zIndex: 2000, offset: 0.0}),
+        style({opacity: 1, transform: 'rotateZ(20deg)', offset: 0.20}),
+        style({opacity: 1, transform: 'rotateY(360deg)', offset: 0.50}),
 
       ]))
     ]), {optional: true})
@@ -19,14 +28,26 @@ trigger('wasteFlip',[
 export let talonAnimation = 
 trigger('talonFlip',[
   transition('*=>*', [
-    query(':enter', style({opacity: 0}), {optional: true}),
-    query(':enter', stagger('50ms', [
+    query(':leave', stagger('30ms', [
       animate('.3s ease-in', keyframes([
-        style({opacity: 1, transform: 'translateX(-230%)', offset: 0.20}),
-        style({opacity: 1, transform: 'translateY(-50%)', offset: 0.30}),
+        style({opacity: 1, zIndex: 2000, offset: 0.0}),
+        style({opacity: 1, transform: 'rotateZ(20deg)', offset: 0.10}),
+        style({opacity: 1, transform: 'translate(10%,-20%)', offset: 0.30}),
         style({opacity: 1, transform: 'rotateY(180deg)', offset: 0.40}),
-        style({opacity: 1, transform: 'translateX(0%)', offset: 0.70 })
+        style({opacity: 1, transform: 'translate(25%,-30%)', offset: 0.80}),
+        style({opacity: 0, offset: 1.0}),
 
+      ]))
+    ]), {optional: true}),
+    query(':enter', stagger('50ms', [
+      animate('2s ease-out', keyframes([
+        style({opacity: 0, zIndex: 3000, transform: 'translate(-30%,-50%)', offset: 0.0}),
+        style({opacity: 1, transform: 'translate(10%,-20%) rotateY(180deg)', offset: 0.10}),
+        style({opacity: 1, transform: 'translate(0%,0%)', offset: 0.20}),
+        style({opacity: 1, transform: 'rotateZ(10deg)', offset: 0.40}),
+        style({opacity: 1, transform: 'rotateZ(5deg)', offset: 0.60}),
+        style({opacity: 1, transform: 'rotateZ(-5deg)', offset: 0.90}),
+        style({opacity: 1, transform: 'rotateZ(0deg)', offset: 1.0}),
       ]))
     ]), {optional: true})
   ])
@@ -64,12 +85,18 @@ trigger('foundationFlip',[
 export let maneuverAnimation = 
 trigger('maneuverFlip',[
   transition('*=>*', [
-    query(':enter', style({opacity: 0}), {optional: true}),
     query(':enter', stagger('50ms', [
-      animate('.3s ease-in', keyframes([
-        style({opacity: 0, transform: 'rotateY(90deg)', offset: 0.30}),
-        style({opacity: 1, transform: 'rotateY(90deg)', offset: 0.60}),
-        style({opacity: 1, transform: 'rotateY(180deg)', offset: 1})
+      animate('0.8s ease-in', keyframes([
+        style({opacity: 1, transform: 'rotateZ(1deg)', offset: 0.30}),
+        style({opacity: 1, transform: 'rotateZ(-1deg)', offset: 0.60}),
+        style({opacity: 1, transform: 'rotateZ(0deg)', offset: 1})
+      ]))
+    ]), {optional: true}),
+    query(':leave', stagger('30ms', [
+      animate('.6s ease-in', keyframes([
+        style({opacity: 1, zIndex: 2000, offset: 0.0}),
+        style({opacity: 1, transform: 'rotateZ(20deg)', offset: 0.20}),
+        style({opacity: 1, transform: 'rotateY(360deg)', offset: 0.50}),
       ]))
     ]), {optional: true})
   ])
@@ -77,9 +104,14 @@ trigger('maneuverFlip',[
 
 export let menuAnimation = 
 trigger('menuSlide',[
-  state('void', style({opacity: 0})),
-
-  transition(':leave',[
-    animate(1000)
+  transition('*=>*', [
+    query(':leave', stagger('1000ms', [
+      animate('2s ease-in', keyframes([
+        style({opacity: 1, transform: 'rotateZ(10deg)', offset: 0.10}),
+        style({opacity: 1, transform: 'rotateZ(-15deg)', offset: 0.20}),
+        style({opacity: 1, transform: 'rotateX(180deg)', offset: 0.30}),
+        style({opacity: 1, transform: 'translate(150%,25%)', offset: 1.0}),
+      ]))
+    ]), {optional: true})
   ])
 ])

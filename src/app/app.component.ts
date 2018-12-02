@@ -1,7 +1,7 @@
 import { maneuverAnimation, wasteAnimation, talonAnimation, foundationAnim} from './animations';
 import { Subscription } from 'rxjs';
 import { UtilityService } from './utility.service';
-import { MODE, DeckTypes } from './enums/enums';
+import { DeckTypes } from './enums/enums';
 import { Card } from './card';
 import { GameControlService } from './game-control.service';
 import { DeckService } from './deck.service';
@@ -31,7 +31,7 @@ export class AppComponent implements OnInit, OnDestroy {
   lastPosX: number = 0;
   lastPosY: number = 0;
   resetPos: boolean = true;
-  gameMode: number = MODE.Hard;
+  flipCount: number = this.deckService.flipCount;
 
   dragging: boolean = false;
   startDrag: boolean = false;
@@ -57,6 +57,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void{
     this.subscription.unsubscribe();
   }
+
   @HostListener('window:resize', ['$event'])
   onresize(event) {
     this.innerWidth = window.innerWidth;
@@ -80,6 +81,25 @@ export class AppComponent implements OnInit, OnDestroy {
     this.onDragEnd(event);
   }
 
+  wasteMargin(card:Card): String {
+    let i = 0;
+    
+    if(this.waste.size > 3){
+      i = ((this.waste.size-1) - this.waste.cardIndex(card))-2;
+    }else{
+      i = this.waste.cardIndex(card);
+    }
+
+    if(i < 0){
+      i *= -1;
+    }
+    if(this.onMobileWindow){
+      return '0% 0% 0%'+i*45+'%';
+    } else {
+      return i*45+'% 0% 0% 0%';
+    }
+  }
+
   addToWaste(event): void {
     event.preventDefault();
     event.stopPropagation();
@@ -94,12 +114,12 @@ export class AppComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.talon.size >= this.gameMode) {
-      startCard = this.talon.cards[this.talon.size - this.gameMode];
+    if (this.talon.size >= this.flipCount) {
+      startCard = this.talon.cards[this.talon.size - this.flipCount];
     } else {
-      startCard = this.talon.cards[this.talon.size - 1];
+      startCard = this.talon.baseCard;
     }
-    this.deckService.transferCard(startCard, this.talon, this.waste);
+    this.deckService.transferCard(startCard, this.talon, this.waste, true);
       this.deckService.suggestNextMove();
   }
 
@@ -109,7 +129,7 @@ export class AppComponent implements OnInit, OnDestroy {
     event.stopPropagation();
 
     if (this.talon.isEmpty() && !this.waste.isEmpty()) {
-      this.deckService.transferCard(this.waste.baseCard, this.waste, this.talon);
+      this.deckService.transferCard(this.waste.baseCard, this.waste, this.talon, true);
       return;
     }
   }
@@ -208,16 +228,16 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     if (this.droppable.classList.contains("placeholders")
       && this.droppable !== selectedCard.parentElement) {
-      destDeck = this.deckService.getDeckInstance(this.droppable.id);
+      destDeck = this.deckService.getDeck(this.droppable.id);
     }
     if (this.droppable.classList.contains("playableCards")
       && !this.isSibling(selectedCard)) {
-      destDeck = this.deckService.getDeckInstance(this.droppable.parentElement.id);
+      destDeck = this.deckService.getDeck(this.droppable.parentElement.id);
     }
      
     if (destDeck !== null && (destDeck.type == DeckTypes.Maneuver || destDeck.type == DeckTypes.Foundation)) {
       if (destDeck.canAccept(this.cardOnPlay)) {
-        this.deckService.transferCard(this.cardOnPlay, this.sourceDeckOnPlay, destDeck);
+        this.deckService.transferCard(this.cardOnPlay, this.sourceDeckOnPlay, destDeck, true);
         this.deckService.suggestNextMove();
         return;
       }

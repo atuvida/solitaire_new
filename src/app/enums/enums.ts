@@ -6,5 +6,5 @@ export enum RANK {
   Nine = 8, Ten = 9, J = 10, Q = 11, K = 12
 };
 export enum SUIT { CLUBS = 0, SPADES = 1, HEARTS = 2, DIAMONDS = 3 };
-export enum MODE{Hard = 3, Easy = 1}
+export enum FLIPS{HARDMODE = 3, EASYMODE = 1}
 export enum SUITSYMBOLS {'♣' = 0, '♠' = 1, '♥' = 2, '♦' = 3};

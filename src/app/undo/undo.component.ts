@@ -21,14 +21,24 @@ export class UndoComponent implements OnInit {
   ngOnInit() {
   }
 
+  gameStat():boolean{
+  
+    return this.deckService.maneuversCleared() ? true : this.gameLogs.length == 1;
+  }
   undoLastMove(){
-    if(this.gameLogs.length <= 1){
+    if(this.utilityService.gameLogs.length <= 1){
       return;
     }
-    let lastLog: GameLog = this.gameLogs.pop();
-    let sourceDeck: Deck = lastLog.SourceDeck;
-    let destDeck: Deck = lastLog.DestDeck;
+    let lastLog: GameLog = this.utilityService.getLog();
+    let destDeck: Deck = lastLog.SourceDeck;
+    let sourceDeck: Deck = lastLog.DestDeck;
     let card: Card = lastLog.Card;
-    this.deckService.transferCard(card, destDeck, sourceDeck,false);
+    let cardSet = lastLog.CardSet;
+
+    if(!sourceDeck.contains(card)){
+      return;
+    }else{
+      this.deckService.transferCard(card, sourceDeck, destDeck,false, cardSet);
+    }
   }
 }

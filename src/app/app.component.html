@@ -9,28 +9,30 @@
     </div>
   </div>
   <div id="maneuver">
-    <div class="placeholders" *ngFor="let maneuver of maneuvers" id="{{maneuver.id}}" [@maneuverFlip]="maneuver.size" >
+    <div [class.placeholders]="!deckService.maneuversCleared()" [class.emptyDeck]="deckService.maneuversCleared()" *ngFor="let maneuver of maneuvers" id="{{maneuver.id}}" [@maneuverFlip]="maneuver.size" >
       <div *ngFor="let card of maneuver.cards; let i=index" (touchstart)="onDragStart($event,card,maneuver)"
         (mousedown)="onDragStart($event,card,maneuver)" (touchmove)="onDrag($event)" (touchend)="onDragEnd($event)"
         [class.playableCards]="card.flipped" [class.nonPlayableCards]="!card.flipped" id="{{card.id}}"
         [style.background-image]="card.flipped ? 'url(./assets/img/cards/'+card.suit+'/'+card.id+'.png)' : 'url(./assets/img/cards/back.png)' "
-        [style.margin-top]="i*35+'%'" (click)="autoPlayCard($event,card,maneuver)" [style.z-index]="auto"></div>
+        [style.margin-top]="i*35+'%'" [style.transform]="card.flipped ? 'rotateY(360deg)' : ''"
+        (click)="autoPlayCard($event,card,maneuver)" [style.z-index]="auto"></div>
     </div>
   </div>
   <div id="{{waste.id}}" [class.loadedDeck]="!talon.isEmpty() || !waste.isEmpty()" [@wasteFlip]="waste.size"
   [class.emptyDeck]="talon.isEmpty() && waste.isEmpty()">
-    <div *ngFor="let card of waste.cards | slice:-3; let i=index;" (touchstart)="onDragStart($event,card,waste)"
+    <div *ngFor="let card of waste.cards; let i=index;" (touchstart)="onDragStart($event,card,waste)"
       (mousedown)="onDragStart($event,card,waste)" (touchmove)="onDrag($event)" (touchend)="onDragEnd($event)"
       [class.playableCards]="card==waste.topCard" [class.nonPlayableCards]="card!=waste.topCard" id="{{card.id}}"
       [style.background-image]="card.flipped ? 'url(./assets/img/cards/'+card.suit+'/'+card.id+'.png)' : 'url(./assets/img/cards/back.png)' "
-      [style.margin]="onMobileWindow ? '0% 0% 0%'+i*45+'%' : i*45+'% 0% 0% 0%'" (click)="autoPlayCard($event,card,waste)">
+      [style.margin]="card.flipped ? wasteMargin(card) : '0% 0% 0% 0%'" (click)="autoPlayCard($event,card,waste)">
     </div>
   </div>
-  <div id="{{talon.id}}" [class.playableDeck]="!talon.isEmpty() || !waste.isEmpty()" [@talonFlip]="talon.size"
+  <div id="{{talon.id}}" [class.loadedDeck]="!talon.isEmpty()"[class.playableDeck]="talon.isEmpty() && !waste.isEmpty()" [@talonFlip]="talon.size"
   [class.emptyDeck]="talon.isEmpty() && waste.isEmpty()"
     (click)="addToWaste($event)">
-    <div *ngFor="let card of talon.cards; let i=index;" [class.playableCards]="card == talon.topCard" id="{{card.id}}"
-      [ngStyle]="{'background-image': 'url(./assets/img/cards/back.png)'}">
+    <div *ngFor="let card of talon.cards; let i=index;" [class.playableCards]="card == talon.topCard"
+    [class.nonPlayableCards]="card != talon.topCard" id="{{card.id}}"
+    [style.background-image]="card.flipped ? 'url(./assets/img/cards/'+card.suit+'/'+card.id+'.png)' : 'url(./assets/img/cards/back.png)' ">
     </div>
   </div>
   <app-menu id="menu"></app-menu>
